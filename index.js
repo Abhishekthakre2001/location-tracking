@@ -12,7 +12,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
-    methods: ['GET','POST']
+    methods: ['GET', 'POST']
   }
 });
 
@@ -49,6 +49,14 @@ io.on('connection', (socket) => {
   socket.on('requestAll', () => {
     socket.emit('allTracks', tracks);
   });
+
+  socket.on('removeUser', ({ id }) => {
+    if (!id) return;
+    delete tracks[id];
+    io.emit('locations', { id, points: [] }); // notify admin clients
+    console.log(`User ${id} removed by admin`);
+  });
+
 
   socket.on('disconnect', () => {
     console.log('Socket disconnected', socket.id);
